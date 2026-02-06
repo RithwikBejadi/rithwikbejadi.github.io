@@ -2,11 +2,31 @@
 import { cn } from "@/lib/utils";
 import { motion, MotionValue } from "framer-motion";
 import React from "react";
-import { TextHoverEffect } from "@/components/ui/text-hover-effect";
+import { Tooltip } from "@/components/ui/tooltip-card";
 
 const transition = {
   duration: 0,
-  ease: "linear",
+  ease: "linear" as const,
+};
+
+// Profile card for tooltip
+const ProfileCard = () => {
+  return (
+    <div className="w-64">
+      <img
+        src="/profile.jpg"
+        alt="Sai Rithwik Bejadi"
+        className="aspect-square w-full rounded-lg object-cover"
+      />
+      <div className="my-4 flex flex-col">
+        <p className="text-lg font-bold text-white">Sai Rithwik Bejadi</p>
+        <p className="mt-1 text-sm text-neutral-400">
+          Full Stack Developer passionate about building elegant solutions and
+          exploring game development.
+        </p>
+      </div>
+    </div>
+  );
 };
 
 export const GoogleGeminiEffect = ({
@@ -21,20 +41,28 @@ export const GoogleGeminiEffect = ({
   className?: string;
 }) => {
   return (
-    <div className={cn("sticky top-80", className)}>
-      <div className="h-[8rem] md:h-[10rem] flex items-center justify-center w-full">
-        <TextHoverEffect text={title || "Sai Rithwik Bejadi"} />
-      </div>
-      <p className="text-sm md:text-2xl font-light text-center text-neutral-300 mt-6 max-w-2xl mx-auto tracking-wide">
-        {description ||
-          `Full Stack Developer, Maintainer, Aspiring Game Engineer`}
-      </p>
-      <div className="w-full h-[890px] -top-60 md:-top-40  flex items-center justify-center bg-red-transparent absolute ">
+    <div
+      className={cn(
+        "sticky top-0 h-screen flex flex-col items-center justify-center pt-0 pb-32",
+        className,
+      )}
+    >
+      <div className="flex flex-col items-center justify-center w-full px-4 z-20 -mt-24">
+        <Tooltip content={<ProfileCard />}>
+          <h1 className="text-5xl md:text-7xl lg:text-[8rem] font-black text-center bg-clip-text text-transparent bg-gradient-to-br from-white via-blue-100 to-blue-500 tracking-tighter leading-none cursor-pointer hover:scale-[1.02] transition-transform duration-300">
+            {title || "Sai Rithwik Bejadi"}
+          </h1>
+        </Tooltip>
+        <p className="text-xl md:text-3xl lg:text-4xl font-light text-center text-neutral-300 max-w-4xl mx-auto tracking-wide mt-8">
+          {description ||
+            `Full Stack Developer • Maintainer • Aspiring Game Engineer`}
+        </p>
+        {/* Resume button */}
         <a
           href="/resume.pdf"
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-slate-800 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-base font-semibold leading-6 text-slate-900 inline-block md:mt-32 mt-12 z-30"
+          className="mt-12 bg-slate-800 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-base font-semibold leading-6 text-slate-900 inline-block"
         >
           <span className="absolute inset-0 overflow-hidden rounded-full">
             <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
@@ -60,11 +88,12 @@ export const GoogleGeminiEffect = ({
           <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40" />
         </a>
       </div>
+      {/* SVG Animation Container */}
       <svg
         viewBox="0 0 1440 890"
         xmlns="http://www.w3.org/2000/svg"
         preserveAspectRatio="none"
-        className="absolute -top-60 md:-top-40 w-full h-[890px]"
+        className="absolute inset-0 w-full h-full"
       >
         <motion.path
           d="M0 663C145.5 663 191 666.265 269 647C326.5 630 339.5 621 397.5 566C439 531.5 455 529.5 490 523C509.664 519.348 521 503.736 538 504.236C553.591 504.236 562.429 514.739 584.66 522.749C592.042 525.408 600.2 526.237 607.356 523.019C624.755 515.195 641.446 496.324 657 496.735C673.408 496.735 693.545 519.572 712.903 526.769C718.727 528.934 725.184 528.395 730.902 525.965C751.726 517.115 764.085 497.106 782 496.735C794.831 496.47 804.103 508.859 822.469 518.515C835.13 525.171 850.214 526.815 862.827 520.069C875.952 513.049 889.748 502.706 903.5 503.736C922.677 505.171 935.293 510.562 945.817 515.673C954.234 519.76 963.095 522.792 972.199 524.954C996.012 530.611 1007.42 534.118 1034 549C1077.5 573.359 1082.5 594.5 1140 629C1206 670 1328.5 662.5 1440 662.5"
