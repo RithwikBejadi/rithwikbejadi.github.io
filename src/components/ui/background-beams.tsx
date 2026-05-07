@@ -3,6 +3,20 @@ import React from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
+const BEAM_COUNT = 50; 
+const stableY2: number[] = Array.from(
+  { length: BEAM_COUNT },
+  (_, i) => 93 + (i % 8),
+);
+const stableDuration: number[] = Array.from(
+  { length: BEAM_COUNT },
+  (_, i) => 10 + (i % 10),
+);
+const stableDelay: number[] = Array.from(
+  { length: BEAM_COUNT },
+  (_, i) => i % 10,
+);
+
 export const BackgroundBeams = React.memo(
   ({ className }: { className?: string }) => {
     const paths = [
@@ -103,13 +117,13 @@ export const BackgroundBeams = React.memo(
                   x1: ["0%", "100%"],
                   x2: ["0%", "95%"],
                   y1: ["0%", "100%"],
-                  y2: ["0%", `${93 + Math.random() * 8}%`],
+                  y2: ["0%", `${stableY2[index]}%`],
                 }}
                 transition={{
-                  duration: Math.random() * 10 + 10,
+                  duration: stableDuration[index],
                   ease: "easeInOut",
                   repeat: Infinity,
-                  delay: Math.random() * 10,
+                  delay: stableDelay[index],
                 }}
               >
                 <stop stopColor="#18CCFC" stopOpacity="0"></stop>

@@ -13,12 +13,20 @@ import {
 
 import { useRef, useState } from "react";
 
+export type FloatingDockItem = {
+  title: string;
+  icon: React.ReactNode;
+  href: string;
+  external?: boolean;
+  active?: boolean;
+};
+
 export const FloatingDock = ({
   items,
   desktopClassName,
   mobileClassName,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
+  items: FloatingDockItem[];
   desktopClassName?: string;
   mobileClassName?: string;
 }) => {
@@ -34,7 +42,7 @@ const FloatingDockMobile = ({
   items,
   className,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
+  items: FloatingDockItem[];
   className?: string;
 }) => {
   const [open, setOpen] = useState(false);
@@ -65,8 +73,14 @@ const FloatingDockMobile = ({
               >
                 <a
                   href={item.href}
-                  key={item.title}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-900"
+                  target={item.external ? "_blank" : undefined}
+                  rel={item.external ? "noopener noreferrer" : undefined}
+                  aria-label={item.title}
+                  className={cn(
+                    "flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/60 backdrop-blur-xl shadow-md shadow-black/30",
+                    item.active && "border-indigo-400/60 bg-indigo-500/20",
+                  )}
+                  onClick={() => setOpen(false)}
                 >
                   <div className="h-4 w-4">{item.icon}</div>
                 </a>
@@ -77,9 +91,9 @@ const FloatingDockMobile = ({
       </AnimatePresence>
       <button
         onClick={() => setOpen(!open)}
-        className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-800"
+        className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/70 backdrop-blur-xl shadow-md shadow-black/30"
       >
-        <IconLayoutNavbarCollapse className="h-5 w-5 text-neutral-400" />
+        <IconLayoutNavbarCollapse className="h-5 w-5 text-neutral-300" />
       </button>
     </div>
   );
@@ -89,16 +103,16 @@ const FloatingDockDesktop = ({
   items,
   className,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
+  items: FloatingDockItem[];
   className?: string;
 }) => {
-  let mouseX = useMotionValue(Infinity);
+  const mouseX = useMotionValue(Infinity);
   return (
     <motion.div
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
       className={cn(
-        "mx-auto hidden h-20 items-end gap-5 rounded-2xl bg-neutral-900 px-5 pb-4 md:flex",
+        "mx-auto hidden h-20 items-end gap-5 rounded-2xl border border-white/15 bg-black/55 px-5 pb-4 shadow-2xl shadow-black/40 backdrop-blur-xl md:flex",
         className,
       )}
     >
@@ -114,47 +128,55 @@ function IconContainer({
   title,
   icon,
   href,
+  external,
+  active,
 }: {
-  mouseX: MotionValue;
+  mouseX: MotionValue<number>;
   title: string;
   icon: React.ReactNode;
   href: string;
+  external?: boolean;
+  active?: boolean;
 }) {
-  let ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
-  let distance = useTransform(mouseX, (val) => {
-    let bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
+  const distance = useTransform(mouseX, (val) => {
+    const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
 
     return val - bounds.x - bounds.width / 2;
   });
 
-  let widthTransform = useTransform(distance, [-150, 0, 150], [50, 90, 50]);
-  let heightTransform = useTransform(distance, [-150, 0, 150], [50, 90, 50]);
+  const widthTransform = useTransform(distance, [-150, 0, 150], [50, 90, 50]);
+  const heightTransform = useTransform(distance, [-150, 0, 150], [50, 90, 50]);
 
-  let widthTransformIcon = useTransform(distance, [-150, 0, 150], [24, 48, 24]);
-  let heightTransformIcon = useTransform(
+  const widthTransformIcon = useTransform(
+    distance,
+    [-150, 0, 150],
+    [24, 48, 24],
+  );
+  const heightTransformIcon = useTransform(
     distance,
     [-150, 0, 150],
     [24, 48, 24],
   );
 
-  let width = useSpring(widthTransform, {
+  const width = useSpring(widthTransform, {
     mass: 0.1,
     stiffness: 150,
     damping: 12,
   });
-  let height = useSpring(heightTransform, {
+  const height = useSpring(heightTransform, {
     mass: 0.1,
     stiffness: 150,
     damping: 12,
   });
 
-  let widthIcon = useSpring(widthTransformIcon, {
+  const widthIcon = useSpring(widthTransformIcon, {
     mass: 0.1,
     stiffness: 150,
     damping: 12,
   });
-  let heightIcon = useSpring(heightTransformIcon, {
+  const heightIcon = useSpring(heightTransformIcon, {
     mass: 0.1,
     stiffness: 150,
     damping: 12,
@@ -162,20 +184,22 @@ function IconContainer({
 
   const [hovered, setHovered] = useState(false);
 
-  const isExternal = href.startsWith("http");
-
   return (
     <a
       href={href}
-      target={isExternal ? "_blank" : undefined}
-      rel={isExternal ? "noopener noreferrer" : undefined}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
+      aria-label={title}
     >
       <motion.div
         ref={ref}
         style={{ width, height }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="relative flex aspect-square items-center justify-center rounded-full bg-neutral-800"
+        className={cn(
+          "relative flex aspect-square items-center justify-center rounded-full border border-white/15 bg-white/5",
+          active && "border-indigo-400/60 bg-indigo-500/20",
+        )}
       >
         <AnimatePresence>
           {hovered && (
@@ -183,7 +207,7 @@ function IconContainer({
               initial={{ opacity: 0, y: 10, x: "-50%" }}
               animate={{ opacity: 1, y: 0, x: "-50%" }}
               exit={{ opacity: 0, y: 2, x: "-50%" }}
-              className="absolute -top-8 left-1/2 w-fit rounded-md border border-neutral-700 bg-neutral-800 px-2 py-0.5 text-xs whitespace-pre text-white"
+              className="absolute -top-8 left-1/2 w-fit rounded-md border border-white/15 bg-black/80 px-2 py-0.5 text-xs whitespace-pre text-neutral-200 shadow-md shadow-black/40"
             >
               {title}
             </motion.div>

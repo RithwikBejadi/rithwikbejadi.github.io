@@ -1,36 +1,58 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import emailjs from "@emailjs/browser";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-// EmailJS Configuration
-const EMAILJS_SERVICE_ID = "service_mnwky88";
-const EMAILJS_TEMPLATE_ID = "template_qsiktpo"; // Create this template in EmailJS dashboard
-const EMAILJS_PUBLIC_KEY = "pRwGRIMfkdykzGBQA"; // Get from EmailJS Account > API Keys
+const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+const EMAILJS_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+
+type ContactFormData = {
+  name: string;
+  email: string;
+  title: string;
+  message: string;
+};
 
 export default function ContactForm() {
-  const formRef = useRef<HTMLFormElement>(null);
   const [status, setStatus] = useState<
     "idle" | "sending" | "success" | "error"
   >("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ContactFormData>({
     name: "",
     email: "",
     title: "",
     message: "",
   });
+  const isConfigured = Boolean(
+    EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY,
+  );
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    const field = name as keyof ContactFormData;
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const serviceId = EMAILJS_SERVICE_ID;
+    const templateId = EMAILJS_TEMPLATE_ID;
+    const publicKey = EMAILJS_PUBLIC_KEY;
+
+    if (!serviceId || !templateId || !publicKey) {
+      setStatus("error");
+      setErrorMessage(
+        "Contact form is not configured yet. Add EmailJS environment variables to enable sending.",
+      );
+      return;
+    }
 
     setStatus("sending");
     setErrorMessage("");
@@ -44,20 +66,22 @@ export default function ContactForm() {
       };
 
       const response = await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
+        serviceId,
+        templateId,
         templateParams,
-        EMAILJS_PUBLIC_KEY,
+        publicKey,
       );
 
-      console.log("EmailJS Response:", response);
+      if (response.status !== 200) {
+        throw new Error(`Email service returned status ${response.status}`);
+      }
+
       setStatus("success");
       setFormData({ name: "", email: "", title: "", message: "" });
 
       // Reset to idle after 5 seconds
       setTimeout(() => setStatus("idle"), 5000);
     } catch (error: unknown) {
-      console.error("EmailJS Error:", error);
       setStatus("error");
       const errMsg =
         error instanceof Error
@@ -71,44 +95,60 @@ export default function ContactForm() {
   };
 
   return (
-    <div className="shadow-input mx-auto w-full max-w-md rounded-2xl bg-black/50 backdrop-blur-sm p-8 border border-neutral-800">
-      <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-neutral-400 mb-2">
-        Get in Touch
+    <div className="shadow-input mx-auto w-full max-w-md rounded-2xl border border-white/10 bg-black/40 p-8 backdrop-blur-xl">
+      <h2 className="font-heading mb-2 bg-gradient-to-r from-white via-indigo-200 to-sky-300 bg-clip-text text-3xl font-semibold text-transparent">
+        Contact
       </h2>
-      <p className="mt-2 max-w-sm text-neutral-400 mb-8">
-        Have a question or want to work together? Send me a message!
+      <p className="mb-8 mt-2 max-w-sm text-neutral-300">
+        Reach out for collaboration, backend discussions, or project work.
       </p>
+      {!isConfigured && (
+        <p className="mb-6 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-200">
+          Contact form is currently in setup mode.
+        </p>
+      )}
 
-      <form ref={formRef} className="space-y-6" onSubmit={handleSubmit}>
+      <form className="space-y-6" onSubmit={handleSubmit}>
         <LabelInputContainer>
-          <Label htmlFor="name">Your Name</Label>
+          <Label htmlFor="name">Name</Label>
           <Input
             id="name"
             name="name"
-            placeholder="John Doe"
+            placeholder="Your name"
             type="text"
+            value={formData.name}
+            onChange={handleChange}
+            disabled={status === "sending"}
+            autoComplete="name"
             required
           />
         </LabelInputContainer>
 
         <LabelInputContainer>
-          <Label htmlFor="email">Email Address</Label>
+          <Label htmlFor="email">Email</Label>
           <Input
             id="email"
             name="email"
             placeholder="your.email@example.com"
             type="email"
+            value={formData.email}
+            onChange={handleChange}
+            disabled={status === "sending"}
+            autoComplete="email"
             required
           />
         </LabelInputContainer>
 
         <LabelInputContainer>
-          <Label htmlFor="title">Subject</Label>
+          <Label htmlFor="title">Topic</Label>
           <Input
             id="title"
             name="title"
-            placeholder="Project inquiry"
+            placeholder="Internship role / project"
             type="text"
+            value={formData.title}
+            onChange={handleChange}
+            disabled={status === "sending"}
             required
           />
         </LabelInputContainer>
@@ -118,16 +158,22 @@ export default function ContactForm() {
           <textarea
             id="message"
             name="message"
-            placeholder="Your message here..."
+            placeholder="Write your message..."
             required
             rows={5}
-            className="shadow-input flex w-full rounded-md border-none bg-zinc-800 px-3 py-2 text-sm text-white transition duration-400 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-neutral-500 focus-visible:ring-[2px] focus-visible:ring-neutral-600 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 shadow-[0px_0px_1px_1px_#404040] resize-none"
+            value={formData.message}
+            onChange={handleChange}
+            disabled={status === "sending"}
+            className="shadow-input flex w-full resize-none rounded-md border border-white/10 bg-slate-900/80 px-3 py-2 text-sm text-neutral-100 transition duration-400 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-neutral-500 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-indigo-400/70 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </LabelInputContainer>
 
         {/* Status Messages */}
         {status === "success" && (
-          <div className="text-emerald-400 text-sm flex items-center gap-2">
+          <div
+            className="flex items-center gap-2 text-sm text-emerald-300"
+            aria-live="polite"
+          >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
@@ -135,12 +181,15 @@ export default function ContactForm() {
                 clipRule="evenodd"
               />
             </svg>
-            Message sent successfully!
+            Thanks, your message was sent.
           </div>
         )}
 
         {status === "error" && (
-          <div className="text-red-400 text-sm flex items-center gap-2">
+          <div
+            className="flex items-center gap-2 text-sm text-red-300"
+            aria-live="polite"
+          >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
@@ -153,7 +202,7 @@ export default function ContactForm() {
         )}
 
         <button
-          className="group/btn relative block h-12 w-full rounded-md bg-gradient-to-br from-zinc-900 to-zinc-900 font-medium text-white shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset] hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="group/btn relative block h-12 w-full rounded-md bg-gradient-to-r from-indigo-500 to-sky-500 font-medium text-white shadow-lg shadow-indigo-900/40 transition-all hover:shadow-xl hover:shadow-indigo-800/50 disabled:cursor-not-allowed disabled:opacity-50"
           type="submit"
           disabled={status === "sending"}
         >
@@ -178,7 +227,7 @@ export default function ContactForm() {
               Sending...
             </span>
           ) : (
-            "Send Message"
+            "Send"
           )}
           <BottomGradient />
         </button>

@@ -1,132 +1,135 @@
+import type { Metadata } from "next";
+import Image from "next/image";
 import TimelineDemo from "@/components/timeline-demo";
+import { Spotlight } from "@/components/ui/spotlight-new";
 import { BackgroundBeams } from "@/components/ui/background-beams";
+import { TextHoverEffect } from "@/components/ui/text-hover-effect";
+import { Tooltip } from "@/components/ui/tooltip-card";
+
+export const metadata: Metadata = {
+  title: "About",
+  description:
+    "Learn about Sai Rithwik Bejadi — a second-year B.Tech AI student at Newton School of Technology (NST'28) currently interning at SalarySe as a Backend Engineer.",
+  openGraph: {
+    title: "About — Sai Rithwik Bejadi",
+    description:
+      "Backend-focused engineer at NST. Interning at SalarySe. Building API systems and AI-integrated workflows.",
+    url: "https://rithwikbejadi.tech/about/",
+  },
+  alternates: {
+    canonical: "https://rithwikbejadi.tech/about/",
+  },
+};
+
+const highlights = [
+  {
+    label: "Backend Engineering",
+    detail:
+      "Node.js, TypeScript, Python, PostgreSQL, MongoDB. APIs, async jobs, and data workflows.",
+  },
+  {
+    label: "AI Workflows",
+    detail:
+      "FastAPI + LangGraph booking flows with async pipelines and conflict-safe scheduling.",
+  },
+  {
+    label: "Open Source",
+    detail:
+      "40+ PRs merged across student and community repos. Some maintainer work included.",
+  },
+  {
+    label: "Team Work",
+    detail:
+      "Backend Intern at SalarySe — shipping features, code reviews, and deployment handoffs.",
+  },
+];
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-black">
-      {/* Full Height About Section */}
-      <section className="relative min-h-screen flex items-center px-6 md:px-12 lg:px-20 overflow-hidden">
-        <BackgroundBeams />
-        <div className="max-w-7xl w-full mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            {/* Left: Text Content */}
-            <div>
-              <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white via-neutral-200 to-neutral-500 mb-8 tracking-tight">
-                About Me
-              </h1>
+    <main className="relative pb-40">
+      <section className="relative overflow-hidden border-b border-white/10">
+        <div className="pointer-events-none absolute inset-0">
+          <BackgroundBeams className="opacity-35" />
+          <Spotlight
+            gradientFirst="radial-gradient(68.54% 68.72% at 55.02% 31.46%, hsla(223, 90%, 62%, .18) 0, hsla(223, 90%, 55%, .08) 50%, hsla(223, 90%, 45%, 0) 85%)"
+            gradientSecond="radial-gradient(50% 50% at 50% 50%, hsla(189, 90%, 62%, .14) 0, hsla(189, 90%, 58%, .06) 80%, transparent 100%)"
+            gradientThird="radial-gradient(50% 50% at 50% 50%, hsla(263, 85%, 68%, .13) 0, hsla(263, 85%, 63%, .05) 80%, transparent 100%)"
+            translateY={-260}
+            width={620}
+            height={1200}
+            smallWidth={250}
+          />
+        </div>
 
-              <div className="space-y-6 text-lg md:text-xl text-neutral-300 leading-relaxed">
-                <p>
-                  I'm a{" "}
-                  <span className="text-white font-semibold">
-                    Full-Stack Developer
-                  </span>{" "}
-                  with internship experience at fast-paced startups,
-                  contributing to production systems and AI-assisted features
-                  across multiple platforms.
-                </p>
-
-                <p>
-                  With proven expertise in{" "}
-                  <span className="text-blue-400 font-semibold">
-                    MERN stack
-                  </span>{" "}
-                  and{" "}
-                  <span className="text-blue-400 font-semibold">
-                    MCP servers
-                  </span>
-                  , I build scalable systems that solve real-world problems. As
-                  an active open-source contributor and maintainer with{" "}
-                  <span className="text-green-400 font-semibold">
-                    40+ pull requests
-                  </span>
-                  , I believe in giving back to the developer community.
-                </p>
-
-                <p>
-                  Currently pursuing{" "}
-                  <span className="text-white font-semibold">
-                    B.Tech in Computer Science
-                  </span>{" "}
-                  at Newton School of Technology, ADYPU, where I maintain a{" "}
-                  <span className="text-purple-400 font-semibold">
-                    CGPA of 8.38
-                  </span>
-                  . I'm passionate about creating elegant, efficient solutions
-                  and always eager to learn new technologies.
-                </p>
-
-                <div className="pt-8 flex flex-wrap gap-4 text-sm">
-                  <div className="bg-neutral-900/50 backdrop-blur-sm rounded-full px-6 py-3 border border-neutral-800">
-                    <span className="text-neutral-400">
-                      Computer Science Student
-                    </span>
-                  </div>
-                  <div className="bg-neutral-900/50 backdrop-blur-sm rounded-full px-6 py-3 border border-neutral-800">
-                    <span className="text-neutral-400">
-                      Full-Stack Developer
-                    </span>
-                  </div>
-                  <div className="bg-neutral-900/50 backdrop-blur-sm rounded-full px-6 py-3 border border-neutral-800">
-                    <span className="text-neutral-400">
-                      Open Source Contributor
-                    </span>
-                  </div>
-                  <div className="bg-neutral-900/50 backdrop-blur-sm rounded-full px-6 py-3 border border-neutral-800">
-                    <span className="text-neutral-400">
-                      Aspiring Game Engineer
-                    </span>
-                  </div>
-                </div>
+        <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 pb-16 pt-24 md:px-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:pt-32">
+          <div className="space-y-6">
+            <div className="w-full max-w-xl">
+              <div className="h-[100px]">
+                <TextHoverEffect text="About" duration={0.2} />
               </div>
             </div>
+            <h1 className="font-heading text-4xl font-semibold tracking-tight text-white sm:text-6xl">
+              Backend engineer. Full-stack when it helps ship.
+            </h1>
+            <p className="max-w-2xl text-lg leading-relaxed text-neutral-300">
+              I&apos;m Sai Rithwik, a second-year B.Tech student at Newton School of
+              Technology (NST&apos;28). I build backend systems — APIs, async workflows,
+              and AI-Agents.
+            </p>
+            <p className="max-w-2xl text-base leading-relaxed text-neutral-400">
+              Currently interning at SalarySe. Primary tech stack includes Node.js, TypeScript. Transitioning into SpringBoot
+            </p>
+          </div>
 
-            {/* Right: Profile Image */}
-            <div className="relative">
-              <div className="relative aspect-square max-w-md mx-auto lg:ml-auto lg:mr-0">
-                {/* Gradient background effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl blur-3xl"></div>
-
-                {/* Image container */}
-                <div className="relative rounded-3xl overflow-hidden border border-neutral-800 shadow-2xl">
-                  <img
-                    src="/profile.jpg?v=2"
-                    alt="Sai Rithwik Bejadi"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
+          <div className="mx-auto w-full max-w-sm">
+            <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/40 shadow-2xl shadow-black/45">
+              <Image
+                src="/PHOTO-2026-02-06-13-33-07.jpg"
+                alt="Sai Rithwik Bejadi"
+                width={720}
+                height={1280}
+                className="h-[520px] w-full object-cover object-top"
+                priority
+              />
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Scroll Down Indicator */}
-        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
-          <p className="text-neutral-400 text-sm font-medium tracking-wider">
-            SCROLL DOWN
+      <section className="mx-auto max-w-6xl px-6 py-20 md:px-10">
+        <div className="mb-8 space-y-2">
+          <h2 className="font-heading text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+            What I Work On
+          </h2>
+          <p className="max-w-2xl text-neutral-400">
+            Hover for details.
           </p>
-          <svg
-            className="w-6 h-6 text-neutral-400"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-          </svg>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {highlights.map((item) => (
+            <Tooltip
+              key={item.label}
+              content={item.detail}
+              containerClassName="w-full"
+            >
+              <div className="rounded-xl border border-white/10 bg-black/35 p-5 shadow-lg shadow-black/30 backdrop-blur-sm">
+                <p className="font-heading text-lg font-semibold text-neutral-100">
+                  {item.label}
+                </p>
+              </div>
+            </Tooltip>
+          ))}
         </div>
       </section>
 
-      {/* Education Timeline Section */}
-      <section className="py-20 px-6 md:px-12 lg:px-20">
-        <div className="max-w-5xl mx-auto mb-20 text-center">
-          <h2 className="text-6xl md:text-7xl lg:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white via-neutral-200 to-neutral-500 tracking-tight mb-6">
-            My Journey
+      <section className="mx-auto max-w-6xl px-6 pb-8 md:px-10">
+        <div className="mb-8 space-y-2">
+          <h2 className="font-heading text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+            Timeline
           </h2>
-          <p className="text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto">
-            From school to professional experiences - here's my story
+          <p className="max-w-2xl text-neutral-400">
+            Education, internships, and open source.
           </p>
         </div>
         <TimelineDemo />

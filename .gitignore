@@ -11,7 +11,7 @@
 
 # next.js
 /.next/
-/out/
+# Note: /out/ is intentionally NOT excluded — it is the static export for deployment
 
 # production
 /build
@@ -24,6 +24,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.next-dev*.log
 
 # local env files
 .env*.local
